@@ -104,12 +104,14 @@ fn take_turn(
 
 fn main() {
     use rand::seq::SliceRandom;
+
+    let mut stdout = std::io::stdout().lock();
     for highest_card in 2..=20 {
         let mut wins: u32 = 0;
         let mut draws: u32 = 0;
         let mut losses: u32 = 0;
 
-        for _ in 0..1000 {
+        for _ in 0..0x4FFFF_u32 {
             // create deck of cards with 13 * 4 cards
             let mut deck: Vec<Card> = CARDS_ONCE
                 .iter()
@@ -173,11 +175,11 @@ fn main() {
                 }
             }
         }
-        fmt2::fmt! { (#) =>
+        fmt2::fmt! { (stdout) =>
             {highest_card} ln
-            "   gewonnen: " {wins} ln
-            "   unentsch: " {draws} ln
-            "   verloren: " {losses} ln
+            "   gewonnen: " {wins} " hex " {wins;h} ln
+            "   unentsch: " {draws} " hex " {draws;h} ln
+            "   verloren: " {losses} " hex " {losses;h} ln
         };
     }
 }
