@@ -175,11 +175,15 @@ fn main() {
                 }
             }
         }
+        let wins_f64 = f64::from(wins);
+        let wins_losses_f64 = f64::from(wins + losses);
+        let win_percent = wins_f64 / wins_losses_f64;
         fmt2::fmt! { (stdout) =>
             {highest_card} ln
             "   gewonnen: " {wins} " hex " {wins;h} ln
             "   unentsch: " {draws} " hex " {draws;h} ln
             "   verloren: " {losses} " hex " {losses;h} ln
+            "          %: " {win_percent} ln
         };
     }
 }
