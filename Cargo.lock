@@ -25,7 +25,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "fmt2"
 version = "0.1.0"
-source = "git+https://github.com/coolCucumber-cat/fmt2.git#0f6eab69d38b802ac3eff91980c37010af310b5f"
+source = "git+https://github.com/coolCucumber-cat/fmt2.git#ae79bd156d72a17c84a58e287bc7548bea1a6cfa"
 
 [[package]]
 name = "getrandom"

@@ -15,24 +15,65 @@ enum Card {
     Ace,
 }
 
-fmt2::fmt_unit_struct!(A);
-// fmt2::enum_alias! {
-// fmt2::enum_alias! {
-//     enum CardNoAce: Card = {
-//         Two,
-//         Three,
-//         Four,
-//         Five,
-//         Six,
-//         Seven,
-//         Eight,
-//         Nine,
-//         Ten,
-//         Jack,
-//         Queen,
-//         King,
-//     }
-// }
+pub trait Value {
+    fn value(&self) -> u8;
+}
+
+impl Value for [Card] {
+    fn value(&self) -> u8 {
+        let (value_sum, ace_count) =
+            self.iter()
+                .fold((0_u8, 0_u8), |(acc_value_sum, acc_ace_count), &card| {
+                    match CardNoAce::try_from(card) {
+                        Ok(card_not_ace) => (acc_value_sum + card_not_ace.value(), acc_ace_count),
+                        Err(()) => (acc_value_sum + 1, acc_ace_count + 1),
+                    }
+                });
+        let Some(value_sum_until_21) = 21_u8.checked_sub(value_sum) else {
+            return value_sum;
+        };
+        let ace_count_needed_for_max_value = value_sum_until_21 / 10;
+        let actual_ace_count = ace_count_needed_for_max_value.min(ace_count);
+        let aces_value_sum = actual_ace_count * 10;
+        aces_value_sum + value_sum
+    }
+}
+
+fmt2::enum_alias! {
+    enum CardNoAce: Card = {
+        Two |
+        Three |
+        Four |
+        Five |
+        Six |
+        Seven |
+        Eight |
+        Nine |
+        Ten |
+        Jack |
+        Queen |
+        King
+    };
+}
+
+impl CardNoAce {
+    pub const fn value(self) -> u8 {
+        match self {
+            Self::Two => 2,
+            Self::Three => 3,
+            Self::Four => 4,
+            Self::Five => 5,
+            Self::Six => 6,
+            Self::Seven => 7,
+            Self::Eight => 8,
+            Self::Nine => 9,
+            Self::Ten => 10,
+            Self::Jack => 10,
+            Self::Queen => 10,
+            Self::King => 10,
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum UndecidedPlayerOutcome {
@@ -63,54 +104,12 @@ fn take_card_from_deck(deck: &mut Vec<Card>, player_cards: &mut Vec<Card>) {
     player_cards.push(deck.pop().expect("ran out of cards"));
 }
 
-fn get_cards_value(cards: &[Card]) -> u8 {
-    cards.iter().fold(0, |value, &card| {
-        value
-            + match card {
-                Card::Two => 2,
-                Card::Three => 3,
-                Card::Four => 4,
-                Card::Five => 5,
-                Card::Six => 6,
-                Card::Seven => 7,
-                Card::Eight => 8,
-                Card::Nine => 9,
-                Card::Ten => 10,
-                Card::Jack => 10,
-                Card::Queen => 10,
-                Card::King => 10,
-                Card::Ace => 1,
-            }
-    })
-    // let aces = cards.iter().filter(|&&card| card == Card::Ace);
-    // let no_aces = cards.iter().filter(|&&card| card != Card::Ace);
-    // let aces_count = aces.cloned().count();
-    // no_aces.fold(0, |value, &card| {
-    //     value
-    //         + match card {
-    //             Card::Two => 2,
-    //             Card::Three => 3,
-    //             Card::Four => 4,
-    //             Card::Five => 5,
-    //             Card::Six => 6,
-    //             Card::Seven => 7,
-    //             Card::Eight => 8,
-    //             Card::Nine => 9,
-    //             Card::Ten => 10,
-    //             Card::Jack => 10,
-    //             Card::Queen => 110,
-    //             Card::King => 10,
-    //             Card::Ace => unreachable!("filtered out all aces, aces are unreachable"),
-    //         }
-    // })+aces.enumerate().fold(0, |value, (i, card)|)
-}
-
 fn take_turn(
     highest_card: u8,
     deck: &mut Vec<Card>,
     hand: &mut Vec<Card>,
 ) -> UndecidedPlayerOutcome {
-    match get_cards_value(hand) {
+    match hand.value() {
         21 => UndecidedPlayerOutcome::Won,
         v if v > 21 => UndecidedPlayerOutcome::Lost,
         v if v > highest_card => UndecidedPlayerOutcome::Undecided(v),
