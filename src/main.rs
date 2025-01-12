@@ -15,6 +15,24 @@ enum Card {
     Ace,
 }
 
+// fmt2::fmt_unit_struct2!(Sus);
+fmt2::enum_alias! {
+    enum CardNoAce: Card = {
+        Two,
+        Three,
+        Four,
+        Five,
+        Six,
+        Seven,
+        Eight,
+        Nine,
+        Ten,
+        Jack,
+        Queen,
+        King,
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum UndecidedPlayerOutcome {
     Won,
