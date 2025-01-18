@@ -99,6 +99,7 @@ const CARDS_ONCE: &[Card; 13] = &[
 ];
 
 const PLAYER_COUNT: usize = 5;
+const GAME_COUNT: usize = 1_000_000;
 
 fn take_card_from_deck(deck: &mut Vec<Card>, player_cards: &mut Vec<Card>) {
     player_cards.push(deck.pop().expect("ran out of cards"));
@@ -124,12 +125,18 @@ fn main() {
     use rand::seq::SliceRandom;
 
     let mut stdout = std::io::stdout().lock();
+    fmt2::fmt! { (stdout) =>
+        "GAME_COUNT = " {GAME_COUNT} ln
+        "PLAYER_COUNT = " {PLAYER_COUNT} ln
+        "TOTAL_TURNS = " {GAME_COUNT * PLAYER_COUNT} ln ln
+    };
+
     for highest_card in 2..=20 {
         let mut wins: u32 = 0;
         let mut draws: u32 = 0;
         let mut losses: u32 = 0;
 
-        for _ in 0..0x4FFFF_u32 {
+        for _ in 0..1_000_000_u32 {
             // create deck of cards with 13 * 4 cards
             let mut deck: Vec<Card> = CARDS_ONCE
                 .iter()
@@ -195,13 +202,13 @@ fn main() {
         }
         let wins_f64 = f64::from(wins);
         let wins_losses_f64 = f64::from(wins + losses);
-        let win_percent = wins_f64 / wins_losses_f64;
+        let win_percent = wins_f64 / wins_losses_f64 * 100.0;
         fmt2::fmt! { (stdout) =>
             {highest_card} ln
-            "   gewonnen: " {wins} " hex " {wins;h} ln
-            "   unentsch: " {draws} " hex " {draws;h} ln
-            "   verloren: " {losses} " hex " {losses;h} ln
-            "          %: " {win_percent} ln
+            @fg(@green)     { "   gewonnen: " {wins} } ln
+            @fg(@yellow)    { "   unentsch: " {draws} } ln
+            @fg(@red)       { "   verloren: " {losses} } ln
+            @fg(@cyan)      { "          %: " {win_percent} } ln
         };
     }
 }
